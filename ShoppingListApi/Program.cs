@@ -1,3 +1,5 @@
+using ShoppingListApi.Models;
+using Microsoft.EntityFrameworkCore;
 namespace ShoppingListApi
 {
     public class Program
@@ -12,14 +14,16 @@ namespace ShoppingListApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-            var app = builder.Build();
+            builder.Services.AddDbContext<ShoppingListContext>(opt =>
+             opt.UseInMemoryDatabase("ShoppingList"));
+           var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+
             }
 
             app.UseHttpsRedirection();
