@@ -4,20 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using ShoppingListApi.Models;
-
+using ShoppingListApi.Filters;
+using ShoppingListApi.Dependencies;
 namespace ShoppingListApi.Controllers
 {
+    [SampleActionFilter]
     [Route("api/[controller]")]
     [ApiController]
     public class GroceriesController : ControllerBase
     {
         private readonly ShoppingListContext _context;
-
-        public GroceriesController(ShoppingListContext context)
+        private readonly IMyDependency1 _MyDependency1;
+        public GroceriesController(ShoppingListContext context, IMyDependency1 myDependency1) 
         {
             _context = context;
+            _MyDependency1= myDependency1;  
         }
 
         // GET: api/Groceries
@@ -30,7 +34,46 @@ namespace ShoppingListApi.Controllers
           }
             return await _context.Grocery.ToListAsync();
         }
+        [HttpGet("/getfile")]
+        public async Task<IActionResult> GetFile()
+        {
+            var myfile = System.IO.File.ReadAllBytes("C:/Users/sb/Desktop/yazı.pdf");
+            return File(myfile, "application/octet-stream", "File Result.pd"); 
+        }
 
+        [HttpPost("/uploadfile")]
+        public async Task<IActionResult> UploadFile([FromForm] IList<IFormFile> files, [FromForm] string input)
+        {
+          
+
+            var myfile = System.IO.File.ReadAllBytes("C:/Users/sb/Desktop/yazı.pdf");
+            return File(myfile, "application/octet-stream", "File Result.pd");
+        }
+        /*
+         <form action="https://localhost:7080/uploadfile" method="post">
+  <label for="files">Select files:</label>
+  <input type="file" id="files" name="files" multiple=""><br><br>
+          <label for="name">name</label>
+  <input type="text" id="name" name="name" ><br>
+                  <label for="age">age</label>
+  <input type="text" id="age" name="age" ><br>
+                  <label for="name">Select files:</label>
+
+
+
+
+  <input type="submit">
+</form>
+         function AJAXSubmit (oFormElement) {
+        event.preventDefault();
+    var oReq = new XMLHttpRequest();
+    oReq.onload = function(e) { 
+console.log(e);
+    };
+    oReq.open("post", oFormElement.action);
+    oReq.send(new FormData(oFormElement));
+  }
+        */
         // GET: api/Groceries/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Grocery>> GetGrocery(int id)

@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-
+using ShoppingListApi.Filters;
 namespace ShoppingListApi.Controllers
 {
+    [SampleActionFilter]
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
