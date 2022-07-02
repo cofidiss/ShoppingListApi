@@ -2,6 +2,8 @@ using ShoppingListApi.Models;
 using Microsoft.EntityFrameworkCore;
 using ShoppingListApi.Dependencies;
 using ShoppingListApi.MiddleWares;
+using System.Text;
+
 namespace ShoppingListApi
 {
 
@@ -26,22 +28,67 @@ namespace ShoppingListApi
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+            //if (app.Environment.IsDevelopment())
+            //{
+            //    app.UseSwagger();
+            //    app.UseSwaggerUI();
 
+            //}
+
+            app.Map("/map1", HandleBranch);
+            //app.MapWhen("/map", HandleBranch);
+            static void HandleBranch(IApplicationBuilder app)
+            {
+                app.Use(async (context,next) =>
+                {
+                    var branchVer = context.Request.Query["branch"];
+
+                    await context.Response.WriteAsync("marp1 oncesi");
+                    await next();
+                    await context.Response.WriteAsync("marp1 sonrasi");
+                });
             }
 
-            app.UseExceptionHandler("/error");
-            app.UseHttpsRedirection();
+            app.UseMiddleware<MiddleWare1>();
+            app.UseMiddleware<MiddleWare2>();
+            //app.Use(async (context,next) =>            
+            //{
+            //   await context.Response.WriteAsync("delegate1 önce1");
 
-            app.UseAuthorization();
-            app.UseMyMiddleware();
+            //    await context.Response.WriteAsync("delegate1 önce2");
+            //    //context.Response.StatusCode = 200;
+            //    await next.Invoke();
+            //    await context.Response.WriteAsync("delegate1 sonra");
+            //    var b = context.Response.HasStarted;
+            //});
+            //app.Use(async (context, next) =>
+            //{
+            //    await context.Response.WriteAsync("delegate2 önce");
+            //    var a = context.Response.HasStarted;
 
-            app.MapControllers();
+            //   // await next.Invoke();
+            //    await context.Response.WriteAsync("delegate2 sonra");
+            //    var b = context.Response.HasStarted;
+            //});
 
-            app.Run();
+            app.Run(async (context) =>
+            {
+                await context.Response.WriteAsync("delegate2 önce");
+                var a = context.Response.HasStarted;
+         
+                await context.Response.WriteAsync("delegate2 sonra");
+                var b = context.Response.HasStarted;
+            });
+            app.Run();  
+           // app.UseExceptionHandler("/error");
+           // app.UseHttpsRedirection();
+
+           // app.UseAuthorization();
+           // app.UseMyMiddleware();
+
+           // app.MapControllers();
+
+           //// app.Run();
         }
-    }
+    }  
 }
